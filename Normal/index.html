@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>HTML5 테트리스</title>
+    <style>
+      :root {
+        --bg: #0b1020;
+        --panel: #0f1733;
+        --text: #e8ecff;
+        --muted: rgba(232, 236, 255, 0.7);
+        --btn: rgba(255, 255, 255, 0.08);
+        --btn2: rgba(255, 255, 255, 0.14);
+        --accent: #7aa2ff;
+        --danger: #ff5a6a;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background:
+          radial-gradient(1000px 800px at 20% 0%, rgba(122, 162, 255, 0.22), transparent 60%),
+          radial-gradient(900px 700px at 80% 10%, rgba(255, 90, 106, 0.18), transparent 55%),
+          var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR",
+          "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        padding: 16px;
+      }
+
+      .app {
+        width: min(1100px, 100%);
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .card {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .stage {
+        padding: 14px;
+        display: grid;
+        gap: 12px;
+        touch-action: none;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 12px;
+        align-items: start;
+      }
+
+      .side {
+        display: grid;
+        gap: 12px;
+        min-width: 170px;
+      }
+
+      .panel {
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+      }
+
+      .panel h3 {
+        margin: 0 0 8px;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .stats {
+        display: grid;
+        gap: 8px;
+      }
+
+      .stat {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+        padding: 10px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .stat .k {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .stat .v {
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+      }
+
+      canvas {
+        width: 100%;
+        display: block;
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .boardWrap {
+        position: relative;
+      }
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 16px;
+        pointer-events: none;
+      }
+
+      .overlay .msg {
+        width: min(420px, 100%);
+        text-align: center;
+        padding: 14px;
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(10px);
+      }
+
+      .overlay .title {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 6px;
+      }
+
+      .overlay .hint {
+        font-size: 13px;
+        color: rgba(232, 236, 255, 0.85);
+        line-height: 1.4;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .btn {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: var(--btn);
+        color: var(--text);
+        border-radius: 14px;
+        padding: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        user-select: none;
+        touch-action: manipulation;
+      }
+
+      .btn:active {
+        background: var(--btn2);
+        transform: translateY(1px);
+      }
+
+      .btn.secondary {
+        color: rgba(232, 236, 255, 0.92);
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .btn.danger {
+        border-color: rgba(255, 90, 106, 0.35);
+        background: rgba(255, 90, 106, 0.14);
+      }
+
+      .kbd {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 12px;
+        color: rgba(232, 236, 255, 0.85);
+      }
+
+      .mobileControls {
+        display: none;
+        gap: 10px;
+        padding: 14px;
+      }
+
+      .mobileGrid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+      }
+
+      .mobileGrid .btn {
+        padding: 14px 12px;
+        min-height: 54px;
+        font-size: 15px;
+      }
+
+      .footnote {
+        color: rgba(232, 236, 255, 0.72);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      @media (max-width: 900px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 700px) {
+        body {
+          padding: 10px;
+        }
+        .row {
+          grid-template-columns: 1fr;
+        }
+        .side {
+          grid-template-columns: 1fr 1fr;
+          min-width: 0;
+        }
+        .mobileControls {
+          display: grid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="card stage" id="stage">
+        <div class="row">
+          <div class="side">
+            <div class="panel">
+              <h3>Hold</h3>
+              <canvas id="hold" aria-label="Hold" role="img"></canvas>
+              <div class="footnote" style="margin-top: 8px">홀드: <span class="kbd">C</span> / 모바일 버튼</div>
+            </div>
+            <div class="panel">
+              <h3>Next</h3>
+              <canvas id="next" aria-label="Next" role="img"></canvas>
+              <div class="footnote" style="margin-top: 8px">
+                회전: <span class="kbd">↑</span>/<span class="kbd">Z</span>/<span class="kbd">X</span> · 하드드롭:
+                <span class="kbd">Space</span>
+              </div>
+            </div>
+            <div class="panel">
+              <h3>Stats</h3>
+              <div class="stats">
+                <div class="stat"><div class="k">Score</div><div class="v" id="score">0</div></div>
+                <div class="stat"><div class="k">Lines</div><div class="v" id="lines">0</div></div>
+                <div class="stat"><div class="k">Level</div><div class="v" id="level">0</div></div>
+              </div>
+            </div>
+            <div class="panel">
+              <h3>Options</h3>
+              <div class="actions">
+                <button class="btn secondary" id="pauseBtn" type="button">Pause</button>
+                <button class="btn danger" id="restartBtn" type="button">Restart</button>
+              </div>
+              <div class="actions" style="margin-top: 10px">
+                <button class="btn" id="soundBtn" type="button">Sound: On</button>
+                <button class="btn" id="helpBtn" type="button">Help</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="boardWrap">
+            <canvas id="board" aria-label="Tetris board" role="img"></canvas>
+            <div class="overlay" id="overlay" aria-hidden="true">
+              <div class="msg">
+                <div class="title" id="overlayTitle">Ready</div>
+                <div class="hint" id="overlayHint">
+                  키보드: ← → ↓ ↑, Space, C, P<br />
+                  모바일: 화면 버튼 / 보드 탭(회전) · 아래로 스와이프(하드드롭)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mobileControls" id="mobileControls">
+          <div class="mobileGrid">
+            <button class="btn" data-action="left" type="button">◀</button>
+            <button class="btn" data-action="rotate" type="button">⟳</button>
+            <button class="btn" data-action="right" type="button">▶</button>
+            <button class="btn" data-action="down" type="button">▼</button>
+            <button class="btn" data-action="hardDrop" type="button">⤓</button>
+            <button class="btn" data-action="hold" type="button">Hold</button>
+          </div>
+          <div class="footnote">
+            팁: 보드 탭=회전 · 아래로 빠르게 스와이프=하드드롭 · 버튼 길게=연속 이동/소프트드롭
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="tetris.js"></script>
+  </body>
+</html>
