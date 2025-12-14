@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>HTML5 Tetris</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <h1>Tetris</h1>
+        <p class="hint">키보드/터치 지원 · 홀드/점수/레벨 · 효과음</p>
+      </div>
+      <div class="top-actions">
+        <button id="pauseBtn" class="btn" type="button" aria-pressed="false">일시정지</button>
+        <button id="restartBtn" class="btn" type="button">재시작</button>
+        <button id="muteBtn" class="btn" type="button" aria-pressed="false">음소거</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel side">
+        <div class="card">
+          <div class="card-title">HOLD</div>
+          <canvas id="holdCanvas" width="120" height="120" aria-label="홀드" role="img"></canvas>
+          <div class="small">C / Hold</div>
+        </div>
+
+        <div class="card stats">
+          <div class="stat"><span>점수</span><strong id="score">0</strong></div>
+          <div class="stat"><span>레벨</span><strong id="level">1</strong></div>
+          <div class="stat"><span>라인</span><strong id="lines">0</strong></div>
+        </div>
+      </section>
+
+      <section class="panel game">
+        <div class="game-wrap">
+          <canvas id="gameCanvas" width="360" height="720" aria-label="테트리스 보드" role="img"></canvas>
+          <div id="overlay" class="overlay hidden" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="panel side">
+        <div class="card">
+          <div class="card-title">NEXT</div>
+          <canvas id="nextCanvas" width="120" height="360" aria-label="다음 블록" role="img"></canvas>
+          <div class="small">P / Pause · R / Restart</div>
+        </div>
+      </section>
+    </main>
+
+    <section class="controls" aria-label="모바일 조작">
+      <div class="controls-row">
+        <button class="pad" data-action="left" type="button">◀</button>
+        <button class="pad" data-action="right" type="button">▶</button>
+        <button class="pad" data-action="down" type="button">▼</button>
+        <button class="pad" data-action="hardDrop" type="button">⤓</button>
+      </div>
+      <div class="controls-row">
+        <button class="pad" data-action="rotCCW" type="button">⟲</button>
+        <button class="pad" data-action="rotCW" type="button">⟳</button>
+        <button class="pad" data-action="hold" type="button">HOLD</button>
+        <button class="pad" data-action="pause" type="button">⏸</button>
+      </div>
+      <p class="controls-help">
+        터치 버튼은 길게 누르면 연속 입력됩니다. (오디오 재생은 첫 입력 후 활성화됩니다.)
+      </p>
+    </section>
+
+    <footer class="footer">
+      <details>
+        <summary>키보드 조작</summary>
+        <ul>
+          <li>이동: ←/→</li>
+          <li>소프트 드롭: ↓</li>
+          <li>하드 드롭: Space</li>
+          <li>회전: ↑ 또는 X(시계), Z(반시계)</li>
+          <li>홀드: C</li>
+          <li>일시정지: P</li>
+          <li>재시작: R</li>
+          <li>음소거: M</li>
+        </ul>
+      </details>
+    </footer>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
+
